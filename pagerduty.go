@@ -25,7 +25,10 @@ func pdQuery(url string, token string) *jq.Object {
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Add("Accept", "application/vnd.pagerduty+json;version=2")
 	req.Header.Add("Authorization", authToken)
-	resp,_ := client.Do(req)
+	resp,err := client.Do(req)
+	if err != nil{
+		debug(fmt.Sprintf("error was %s",err))
+	}
 	defer resp.Body.Close()
 	body,_ := jq.NewObjectFromReader(resp.Body)
 	return body
@@ -63,7 +66,9 @@ func pdProcessLog(log *jq.Object) error {
 func pdGetIncidents(token string) []*PDIncident{
 	ret := []*PDIncident{}
 	iURL := fmt.Sprintf("https://api.pagerduty.com/incidents?time_zone=UTC&since=%s",hrAgo())
+	debug(iURL)
 	raw := pdQuery(iURL,token)
+	debug(raw.String())
 	incidents,_ := raw.GetObjectArray("incidents")
 	for _,incident := range incidents{
 		id,_ := incident.GetString("id")
