@@ -1,11 +1,11 @@
 package main
+// implements the Pager Duty Collector
 
 import (
 	"net/http"
 	"fmt"
 	"os"
 	"time"
-	"strconv"
 	jq "github.com/antonholmquist/jason"
 )
 
@@ -14,9 +14,41 @@ type PDIncident struct{
 	Logs			[]*jq.Object
 }
 
-func hrAgo() string{
-	offset,_ := strconv.Atoi(os.Getenv("PDHOURS"))
-	return time.Now().UTC().Add(time.Duration(offset)*time.Hour).Format("2006-01-02T15:04:05Z")
+//implements Collector interface
+type PDCollector struct{
+	Token string
+}
+
+var pdCollector = &PDCollector{}
+
+func init(){
+	COLLECTORS = append(COLLECTORS,pdCollector)
+}
+
+func (this *PDCollector) Name() string{
+	return `PagerDuty`
+}
+
+func (this *PDCollector) Enabled() bool{
+	if token := os.Getenv("PDTOKEN"); token != ``{
+		this.Token = token
+		return true
+	}else{
+		return false
+	}
+}
+
+func (this *PDCollector) Run(offset int){
+	for _,incident := range pdGetIncidents(this.Token, offset){
+		increment("pagerduty.incidents",1)
+		for _,log := range incident.Logs{
+			pdProcessLog(log)
+		}
+	}
+}
+
+func since(offset int) string{
+	return time.Now().UTC().Add(time.Duration(offset)*-1*time.Minute).Format("2006-01-02T15:04:05Z")
 }
 
 func pdQuery(url string, token string) *jq.Object {
@@ -63,9 +95,9 @@ func pdProcessLog(log *jq.Object) error {
 	return nil
 }
 
-func pdGetIncidents(token string) []*PDIncident{
+func pdGetIncidents(token string, offset int) []*PDIncident{
 	ret := []*PDIncident{}
-	iURL := fmt.Sprintf("https://api.pagerduty.com/incidents?time_zone=UTC&since=%s",hrAgo())
+	iURL := fmt.Sprintf("https://api.pagerduty.com/incidents?time_zone=UTC&since=%s",since(offset))
 	debug(iURL)
 	raw := pdQuery(iURL,token)
 	debug(raw.String())
@@ -79,13 +111,4 @@ func pdGetIncidents(token string) []*PDIncident{
 		ret = append(ret, me)
 	}
 	return ret
-}
-
-func runPagerDuty(token string) {
-	for _,incident := range pdGetIncidents(token){
-		increment("pagerduty.incidents",1)
-		for _,log := range incident.Logs{
-			pdProcessLog(log)
-		}
-	}
 }

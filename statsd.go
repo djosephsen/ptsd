@@ -1,13 +1,36 @@
 package main
 
 import (
-	"fmt"
+	"os"
+	"strconv"
 	statsd "github.com/etsy/statsd/examples/go"
 )
 
-var metrics = statsd.New(`localhost`, 8125)
+type SDOutputter struct{
+	Server	string
+	Port		int
+}
+var SD = &SDOutputter{}
 
-func increment(key string, value int){
-	fmt.Printf("%s:: +%d\n",key,value)
+func init(){
+	OUTPUTTERS = append(OUTPUTTERS,SD)
+}
+
+func (this *SDOutputter) Increment(key string, value int){
+	metrics := statsd.New(this.Server, this.Port)
 	metrics.IncrementByValue(key, value)
+}
+
+func (this *SDOutputter) Enabled() bool{
+	if server := os.Getenv("SD_SERVER"); server == ``{
+		return false
+	}else{
+		this.Server = server
+	}
+	if port := os.Getenv("SD_PORT"); port == ``{
+		return false
+	}else{
+		this.Port,_ = strconv.Atoi(port)
+	}
+	return true
 }
