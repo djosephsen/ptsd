@@ -11,6 +11,10 @@ func init(){
 	OUTPUTTERS = append(OUTPUTTERS,TXT)
 }
 
+func (this *TextOutputter) Name() string{
+	return `Text Outputter`
+}
+
 func (this *TextOutputter) Increment(key string, value int){
 	fmt.Printf("%s :: +%d\n",key,value)
 }

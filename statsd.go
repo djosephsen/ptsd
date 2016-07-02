@@ -16,6 +16,10 @@ func init(){
 	OUTPUTTERS = append(OUTPUTTERS,SD)
 }
 
+func (this *SDOutputter) Name() string{
+	return `Statsd Outputter`
+}
+
 func (this *SDOutputter) Increment(key string, value int){
 	metrics := statsd.New(this.Server, this.Port)
 	metrics.IncrementByValue(key, value)

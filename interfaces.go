@@ -9,4 +9,5 @@ type Collector interface{
 type Outputter interface{
 	Enabled() bool
 	Increment(string, int)
+	Name() string
 }
