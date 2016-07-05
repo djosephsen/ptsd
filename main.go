@@ -4,6 +4,7 @@ import (
 	"os"
 	"fmt"
 	"strconv"
+	"time"
 )
 
 var COLLECTORS = []Collector{}
@@ -18,11 +19,15 @@ func main(){
 	}
 	debug(fmt.Sprintf("Configured offset: %d",offset))
 
-	for _,collector := range COLLECTORS{
-		if collector.Enabled(){
-			debug(fmt.Sprintf("collector enabled: %s",collector.Name()))
-			collector.Run(offset)
+	ticker := time.NewTicker(time.Duration(offset)*time.Minute) 
+	for {
+		for _,collector := range COLLECTORS{
+			if collector.Enabled(){
+				debug(fmt.Sprintf("collector enabled: %s",collector.Name()))
+				collector.Run(offset)
+			}
 		}
+		<- ticker.C
 	}
 }
 

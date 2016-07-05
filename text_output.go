@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 )
 
 type TextOutputter struct{}
@@ -20,5 +21,9 @@ func (this *TextOutputter) Increment(key string, value int){
 }
 
 func (this *TextOutputter) Enabled() bool{
-	return true
+	if os.Getenv(`PTSD_TXT`) != ``{
+		return true
+	}else{
+		return false
+	}
 }
