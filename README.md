@@ -36,8 +36,12 @@ A couple things you should know about configuring PTSD:
 
 ## Extending
 
-If you speak Go and you'd like to extend PTSD to support alternative collectors
-or outputters just drop a file in the root dir that implements the `Outputter`
-or `Collector` interface (see [interfaces.go](/interfaces.go)). Then append
-your new thingy to the global `OUTPUTTERS` or `COLLECTORS` slice [like
-so](https://github.com/djosephsen/ptsd/blob/master/pagerduty.go#L24-L26)
+PTSD is currently neither godoc'd nor gofmt'd. I don't really feel bad about
+either of those things since I mostly wrote this on the plane-ride home from
+monitorama.
+
+But if you speak Go and you'd like to extend PTSD to support alternative
+collectors or outputters just drop a file in the root dir that implements the
+`Outputter` or `Collector` interface (see [interfaces.go](/interfaces.go)).
+Then append your new thingy to the global `OUTPUTTERS` or `COLLECTORS` slice
+[like so](https://github.com/djosephsen/ptsd/blob/master/pagerduty.go#L24-L26)
