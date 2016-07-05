@@ -5,8 +5,8 @@ import (
 	"os"
 )
 
-func debug(msg string){
+func debug(msg string) {
 	if os.Getenv("DEBUG") != `` {
-		fmt.Printf("DEBUG :: %s\n",msg)
+		fmt.Printf("DEBUG :: %s\n", msg)
 	}
 }

@@ -1,12 +1,12 @@
 package main
 
-type Collector interface{
+type Collector interface {
 	Enabled() bool
 	Run(int)
 	Name() string
 }
 
-type Outputter interface{
+type Outputter interface {
 	Enabled() bool
 	Increment(string, int)
 	Name() string
