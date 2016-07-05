@@ -91,6 +91,10 @@ func pdProcessLog(log *jq.Object) error {
 			key := fmt.Sprintf("pagerduty.%s.assigned", user)
 			increment(key, 1)
 		}
+	} else if entry_type == `acknowledge_log_entry` {
+		user, _ := log.GetString("agent","summary")
+		key := fmt.Sprintf("pagerduty.%s.notified", user)
+		increment(key, 1)
 	}
 	//todo proper error checking
 	return nil

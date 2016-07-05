@@ -19,6 +19,15 @@ func main() {
 	}
 	debug(fmt.Sprintf("Configured offset: %d", offset))
 
+	if enabledCollectors() == 0{
+		fmt.Println("No collectors enabled!")
+		os.Exit(2)
+	}
+	if enabledOutputters() == 0{
+		fmt.Println("No outputters enabled!")
+		os.Exit(2)
+	}
+
 	ticker := time.NewTicker(time.Duration(offset) * time.Minute)
 	for {
 		for _, collector := range COLLECTORS {
@@ -37,4 +46,24 @@ func increment(key string, value int) {
 			outputter.Increment(key, value)
 		}
 	}
+}
+
+func enabledCollectors() int{
+	c := 0
+	for _, collector := range COLLECTORS {
+		if collector.Enabled(){
+			c += 1
+		}
+	}
+	return c
+}
+
+func enabledOutputters() int{
+	c := 0
+	for _, outputter := range OUTPUTTERS {
+		if outputter.Enabled(){
+			c += 1
+		}
+	}
+	return c
 }
